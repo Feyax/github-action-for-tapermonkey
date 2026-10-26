@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import leveldb
+import plyvel
 import sys
 import re
 import json
@@ -67,12 +67,13 @@ os.makedirs(output_dir,exist_ok=True)
 
 pattern = re.compile("^@source(.*)$")
 
-db = leveldb.LevelDB(leveldb_dir)
+#db = leveldb.LevelDB(leveldb_dir)
+db = plyvel.DB(leveldb_dir, create_if_missing=False)
 
-for k, v in db.RangeIter():
+for k, v in db.iterator():
     m = pattern.match(k.decode('utf-8'))
     if m:
-        name = re.sub("[\W\b]", "_", m.groups()[0].strip())
+        name = re.sub(r"[\W\b]", "_", m.groups()[0].strip())
         # full_name = "%s.user.js" % name
         full_name = os.path.join(output_dir,"%s.user.js" % name)
 
